@@ -119,11 +119,15 @@ namespace ToolsToLive.Hierarchy
         public static List<T> FindChilds<T>(IHierarchyItem<T, string, string> host) where T : IHierarchyItem<T, string, string>
         {
             List<T> result = new List<T>();
-            foreach (T item in host.Childs) //Iterate over all descendants of the current element (for which Id == hostId)
+            if (host.Childs != null)
             {
-                result.AddRange(FindChilds<T>(item));
-                result.Add(item);
+                foreach (T item in host.Childs) //Iterate over all descendants of the current element (for which Id == hostId)
+                {
+                    result.AddRange(FindChilds<T>(item));
+                    result.Add(item);
+                }
             }
+
             return result;
         }
 
