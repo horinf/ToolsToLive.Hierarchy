@@ -6,17 +6,19 @@ namespace ToolsToLive.Hierarchy.Interfaces
     /// An element in hierarchy, that can contain children - the same type elements.
     /// </summary>
     /// <typeparam name="T">Type of the element.</typeparam>
-    public interface IHierarchyItem<T>
+    /// <typeparam name="TId">Type of the identifier field (e.g. string or int).</typeparam>
+    /// <typeparam name="TParentId">Type of the parent identifier (should be nullable and comparable to Id) (e.g. string, int?)TParentId.</typeparam>
+    public interface IHierarchyItem<T, TId, TParentId>
     {
         /// <summary>
         /// Identifier.
         /// </summary>
-        string Id { get; }
+        TId Id { get; }
 
         /// <summary>
         /// Parent Id.
         /// </summary>
-        string ParentId { get; }
+        TParentId ParentId { get; }
 
         /// <summary>
         /// Parent.
