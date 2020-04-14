@@ -4,38 +4,34 @@ using ToolsToLive.Hierarchy.Interfaces;
 
 namespace ToolsToLive.Hierarchy
 {
-    public static class HierarchyToolsForIntId
+    public class HierarchyToolsForIntId<T> : IHierarchyTools<T, int, int?> where T : class, IHierarchyItem<T, int, int?>
     {
-        /// <summary>
-        /// Converts a flat list to a hierarchy.
-        /// </summary>
-        /// <typeparam name="T">Type of the elements.</typeparam>
-        /// <param name="source">Flat list of the elements.</param>
-        /// <param name="selectedId">Current element (null if not used or no element selected)</param>
-        /// <returns>Hierarchy list.</returns>
-        public static List<T> ToHierarhyList<T>(this IEnumerable<T> source, int? selectedId) where T : class, IHierarchyItem<T, int, int?>
-        {
-            T selectedElement = null;
-            if (selectedId.HasValue)
-                selectedElement = source.FirstOrDefault(x => x.Id == selectedId);
+        private readonly HierarchyOptions _options;
 
-            List<T> hList = source.ToHierarhyList();
+        public HierarchyToolsForIntId(HierarchyOptions options)
+        {
+            _options = options;
+        }
+
+        ///<inheritdoc/>
+        public List<T> ToHierarhyList(IEnumerable<T> source, int selectedId)
+        {
+            T selectedElement = source.FirstOrDefault(x => x.Id == selectedId);
+
+            List<T> hList = ToHierarhyList(source);
             if (selectedElement != null)
             {
                 selectedElement.IsSelected = true;
                 foreach (var parent in FindParents(selectedElement))
+                {
                     parent.HasSelectedChild = true;
+                }
             }
             return hList;
         }
 
-        /// <summary>
-        /// Converts a flat list to a hierarchy.
-        /// </summary>
-        /// <typeparam name="T">Type of the elements.</typeparam>
-        /// <param name="source">Flat list of the elements.</param>
-        /// <returns>Hierarchy list.</returns>
-        public static List<T> ToHierarhyList<T>(this IEnumerable<T> source) where T : IHierarchyItem<T, int, int?>
+        ///<inheritdoc/>
+        public List<T> ToHierarhyList(IEnumerable<T> source)
         {
             int level = 1;
             List<T> HierarchyList = new List<T>();
@@ -49,75 +45,65 @@ namespace ToolsToLive.Hierarchy
             return HierarchyList;
         }
 
-        private static List<T> AddChilds<T>(T element, IEnumerable<T> allelements, int level) where T : IHierarchyItem<T, int, int?>
+        private List<T> AddChilds(T element, IEnumerable<T> allelements, int level)
         {
             List<T> ChildsList = new List<T>();
             foreach (T item in allelements.Where(x => x.ParentId == element.Id)) //listing all children for the current item
             {
                 item.HierarhyLevel = level;
                 item.Childs = AddChilds(item, allelements, level + 1); //in this case, the old list of children is lost
-                item.Parent = element;
+                {
+                    item.Parent = element;
+                }
                 ChildsList.Add(item);
             }
             return ChildsList;
         }
 
-        /// <summary>
-        /// A recursive method for finding an element by Id in a hierarchical collection (with a list of where to look for and Id of the element to be searched).
-        /// </summary>
-        /// <param name="allElementsList">The hierarchical list in which to search for an item.</param>
-        /// <param name="Id">Item Id.</param>
-        /// <returns>Element or null if element not found.</returns>
-        public static T FindElement<T>(IEnumerable<T> allElementsList, int Id) where T : class, IHierarchyItem<T, int, int?>
+        ///<inheritdoc/>
+        public T FindElement(IEnumerable<T> allElementsList, int Id)
         {
             foreach (T itemNodeData in allElementsList)
             {
                 if (itemNodeData.Id == Id)
+                {
                     return itemNodeData;
+                }
 
                 if (itemNodeData.Childs.Count > 0)
                 {
-                    T returnedNodeData = FindElement<T>(itemNodeData.Childs, Id);
+                    T returnedNodeData = FindElement(itemNodeData.Childs, Id);
                     if (returnedNodeData != null)
+                    {
                         return returnedNodeData;
+                    }
                 }
             }
             return null;
         }
 
-        /// <summary>
-        /// Search for all descendants of an element with the specified hostId. Returns an unordered list of descendants without a hierarchical layout. "Owner of the offspring" is not included in the list.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="allElementsList">Complete, unordered list of items</param>
-        /// <param name="hostId">Id of the item from the list whose descendants need to be found</param>
-        /// <returns>List of element (empty list if elements not found).</returns>
-        public static List<T> FindChilds<T>(IEnumerable<T> allElementsList, int hostId) where T : IHierarchyItem<T, int, int?>
+        ///<inheritdoc/>
+        public List<T> FindChilds(IEnumerable<T> allElementsList, int hostId)
         {
             List<T> result = new List<T>();
             foreach (T item in allElementsList.Where(x => x.ParentId == hostId)) //Iterate over all descendants of the current element (for which Id == hostId)
             {
-                result.AddRange(FindChilds<T>(allElementsList, item.Id));
+                result.AddRange(FindChilds(allElementsList, item.Id));
                 result.Add(item);
             }
 
             return result;
         }
-
-        /// <summary>
-        /// Search for all descendants of the element specified in the parameter. Returns an unordered list of descendants without a hierarchical layout. "Owner of the offspring" is not included in the list.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="host">An element whose descendants need to be found</param>
-        /// <returns>List of element (empty list if elements not found).</returns>
-        public static List<T> FindChilds<T>(IHierarchyItem<T, int, int?> host) where T : IHierarchyItem<T, int, int?>
+       
+        ///<inheritdoc/>
+        public List<T> FindChilds(IHierarchyItem<T, int, int?> host)
         {
             List<T> result = new List<T>();
             if (host.Childs != null)
             {
                 foreach (T item in host.Childs) //Iterate over all descendants of the current element (for which Id == hostId)
                 {
-                    result.AddRange(FindChilds<T>(item));
+                    result.AddRange(FindChilds(item));
                     result.Add(item);
                 }
             }
@@ -125,12 +111,8 @@ namespace ToolsToLive.Hierarchy
             return result;
         }
 
-        /// <summary>
-        /// Listing Parent Elements for a Specified element.
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns>List of element (empty list if elements not found).</returns>
-        public static List<T> FindParents<T>(IHierarchyItem<T, int, int?> element) where T : IHierarchyItem<T, int, int?>
+        ///<inheritdoc/>
+        public List<T> FindParents(IHierarchyItem<T, int, int?> element)
         {
             List<T> Parents = new List<T>();
             IHierarchyItem<T, int, int?> CurrentNode = element;
