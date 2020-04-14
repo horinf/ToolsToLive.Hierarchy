@@ -43,10 +43,7 @@ namespace ToolsToLive.Hierarchy
             foreach (T item in source.Where(x => x.ParentId == null))
             {
                 item.HierarhyLevel = level;
-                if (source.FirstOrDefault(x => x.ParentId == item.Id) != null) //if there is at least one element whose current is indicated by the parent, then the current has children and they need to be added
-                {
-                    item.Childs = AddChilds(item, source, level + 1); //in this case, the old list of children is lost
-                }
+                item.Childs = AddChilds(item, source, level + 1); //in this case, the old list of children is lost
                 HierarchyList.Add(item);
             }
             return HierarchyList;
@@ -58,10 +55,7 @@ namespace ToolsToLive.Hierarchy
             foreach (T item in allelements.Where(x => x.ParentId == element.Id)) //listing all children for the current item
             {
                 item.HierarhyLevel = level;
-                if (allelements.FirstOrDefault(x => x.ParentId == element.Id) != null) //if there is at least one element whose current is indicated by the parent, then the current has children and they need to be added
-                {
-                    item.Childs = AddChilds(item, allelements, level + 1); //in this case, the old list of children is lost
-                }
+                item.Childs = AddChilds(item, allelements, level + 1); //in this case, the old list of children is lost
                 item.Parent = element;
                 ChildsList.Add(item);
             }
