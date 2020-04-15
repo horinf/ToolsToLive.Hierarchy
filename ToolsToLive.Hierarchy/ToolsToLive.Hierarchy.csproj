@@ -8,7 +8,7 @@
     <Copyright>ToitskyMA, horinf</Copyright>
     <PackageTags>Hierarchy, parent and childs items</PackageTags>
     <RepositoryUrl>https://github.com/horinf/ToolsToLive.Hierarchy</RepositoryUrl>
-    <Description>Tools to convert a flat list to a hierarchy based on ParentId properties and work with hierarchy collection.</Description>
+    <Description>Tools to convert a flat list to a hierarchy based on ParentId properties and work with hierarchy collection (child or parent search, element selecting etc.).</Description>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
