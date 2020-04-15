@@ -52,6 +52,7 @@ namespace ToolsToLive.Hierarchy
             {
                 item.HierarhyLevel = level;
                 item.Childs = AddChilds(item, allelements, level + 1); //in this case, the old list of children is lost
+                if (_options.SetParents)
                 {
                     item.Parent = element;
                 }
