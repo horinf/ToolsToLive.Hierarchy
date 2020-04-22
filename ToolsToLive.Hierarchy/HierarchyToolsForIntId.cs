@@ -36,7 +36,8 @@ namespace ToolsToLive.Hierarchy
             int level = 1;
             List<T> HierarchyList = new List<T>();
             //go over the list of top-level elements and add child elements to them, if any
-            foreach (T item in source.Where(x => x.ParentId == null))
+            // we do pass 'source' collection to the recursive methods. In order to avoid surprises, we create a new array for foreach.
+            foreach (T item in source.Where(x => x.ParentId == null).ToArray())
             {
                 item.HierarhyLevel = level;
                 item.Childs = AddChilds(item, source, level + 1); //in this case, the old list of children is lost
@@ -48,7 +49,8 @@ namespace ToolsToLive.Hierarchy
         private List<T> AddChilds(T element, IEnumerable<T> allelements, int level)
         {
             List<T> ChildsList = new List<T>();
-            foreach (T item in allelements.Where(x => x.ParentId == element.Id)) //listing all children for the current item
+            // we do pass 'allelements' collection to the recursive methods. In order to avoid surprises, we create a new array for foreach.
+            foreach (T item in allelements.Where(x => x.ParentId == element.Id).ToArray()) //listing all children for the current item
             {
                 item.HierarhyLevel = level;
                 item.Childs = AddChilds(item, allelements, level + 1); //in this case, the old list of children is lost
@@ -87,7 +89,8 @@ namespace ToolsToLive.Hierarchy
         public List<T> FindChilds(IEnumerable<T> allElementsList, int hostId)
         {
             List<T> result = new List<T>();
-            foreach (T item in allElementsList.Where(x => x.ParentId == hostId)) //Iterate over all descendants of the current element (for which Id == hostId)
+            // we do pass 'allElementsList' collection to the recursive methods. In order to avoid surprises, we create a new array for foreach.
+            foreach (T item in allElementsList.Where(x => x.ParentId == hostId).ToArray()) //Iterate over all descendants of the current element (for which Id == hostId)
             {
                 result.AddRange(FindChilds(allElementsList, item.Id));
                 result.Add(item);
